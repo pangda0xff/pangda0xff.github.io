@@ -1,0 +1,32 @@
+<style><!--
+code{
+        border-radius : 2px;
+        background-color : rgb(220,220,220);
+    }
+    
+    h3{
+        font-size : 16px;
+        margin : 5px 0;
+    }
+--></style>
+<h2 id="prism-和-angularjs-的比较">Prism 和 Angularjs 的比较</h2>
+<h3 id="mv">MV*</h3>
+<p>angular 声称自己是MVC，其实HTML的前端领域，各种MV*里面，很难找到典型意义上的Controller。在服务器端，Controller的定位是很明确的，就是接受http request,进行相应的调度。但是在前段领域，情况要复杂得多。前端没有http request那么明确的入口点，处理基本上是MouseMove之类的界面事件。Controller在此处比较无力。Prism使用的是Silverlight/WPF仅此一家的MVVM模式&mdash;&mdash;至少目前为止，我还没有看到比较给力的克隆。MVVM的核心就在于无比给力的绑定引擎，这是运行时提供的，HTML只有羡慕嫉妒恨的份。有赖于此，Prism的界面和业务逻辑区分得相当清楚（HTML的MVC框架，多多少少都有点沾水）。但绑定引擎的负面效应就是复杂性，由此引申来的<code>Converter</code> <code>ValidateError</code> 等概念不是三两天等理清的。</p>
+<p>和过去的各种框架相比，angular在很多方面是有突破的：比如过去的框架总是试图在DOM的基础上进行扩展，增加一些事件处理函数，使用前段模板。angular则是在DOM之上又厚厚地铺了一层-<code>$compile</code>（实际上它才是真正意义上的Controller）,从事件处理到网络请求，全部放到自己的盒子里面来。彻底从DOM不完善的设计中解放出来。至少在思想上，围观群众都大开眼界了。</p>
+<h3 id="dependency-injection">Dependency Injection</h3>
+<p>曾几何时，我认为javascript不可能有DI：毕竟DI是基于类型进行的，对于弱类型的javascript要怎么注入呢？google再次让我们开了眼界-基于字符串注入。不过终究受限于javascript的弱类型，还是留下了一些遗憾，比如由字符串唯一标示的各种注入对象难于管理。相比之下Prism使用的Unity和MEF注入框架就要&ldquo;根正苗红&rdquo;得多了，不仅功能更加强大，且静态类型的注入也更加健壮，在程序规模扩大之后，这点差距表现得更加明显。</p>
+<h3 id="解耦-模块化">解耦 || 模块化</h3>
+<p>javascript中模块管理的缺失催生了各种各样的模块化方案，angular便是其中之一 。有两点，一还是模块通过字符串标示；二是所有依赖的模块必须先加载。相比之下，Prism的模块可以Load OnDemand，不过这倒未必是优势，后面会讲到。</p>
+<h3 id="模块间通信">模块间通信</h3>
+<p>Prism 通过<code>IEventAggregator</code> 来实现松耦合模块间的通信。每种事件都需要定义相应的类。通过事件的类型来处理Pub/Sub关系。好处是Pub与Sub间关系明确，事件准确送达，效率比较高；缺点是每个事件都需要定义一个类。</p>
+<p>angular scope 间通过 <code>$on</code> <code>$emit</code> <code>$broadcast</code> 来通信。事件通过广播或者冒泡的方式传播，效率比较低。事件类型不需要事先定义，由字符串标示，payload也是动态的。比较灵活，但也比较难以管理。</p>
+<h3 id="导航">导航</h3>
+<p>这里的导航，讲的是在单页面情况下各种View的变化。angular的这种导航依赖于url hash。优点是页面状态通过url hash保存了下来，可以用于收藏或者发送，缺点在于限制了url hash的其它应用。Prism的导航基于named dependency injection和INaviga*接口，Prism提供了更加强大的导航功能，比如NavigateTo和NavigateFrom事件，比如对于Selector Control 的Region，导航是追加新标签而不是替换原有的。</p>
+<h3 id="前后台进程-vs-apply">前后台进程 VS $apply</h3>
+<p>silverlight是多进程的，包含了唯一的UI线程和多个后台线程。理论上只有更新UI的代码才需要占用UI线程，这主要是为了保持UI的高响应。很多时候&mdash;&mdash;比如在服务回调的时候&mdash;&mdash;需要Dispatcher到UI线程执行界面更新。DOM是单线程的，我们不用担心后台线程不能更新UI的问题，但这同时也意味着，在执行长时间的计算任务的时候，UI可能会出现假死，现代浏览器都会监视javascript的执行时间，很可能计算任务未完成便被终止了。</p>
+<p>angular有个和silverlight的前后台线程很相似的问题，就是<code>$apply</code>的问题。在angular中，要保证数据绑定等功能能够正常工作，代码必须跑在angular的盒子中，而一些网络回调之类的方法却在盒子之外，需要<code>$apply</code>帮助&mdash;&mdash;和Dispatcher很像是不是？</p>
+<h3 id="api风格">api风格</h3>
+<p>silverlight运行时本身提供的功能便要比javascript/DOM强大得多。Prism在功能上也比angular更加强大。angular似乎没打算和谁比功能，比如在引入<code>$q</code>的时候甚至做了功能裁剪。实际上大部分时候我们要用到的东西也就那些，silverlight的<code>style``template</code>都有过于复杂的嫌疑。</p>
+<h3 id="内容管理">内容管理</h3>
+<p>HTML本来就是作为一种文档格式出现的，在管理内容方面可谓得心应手。相比之下silverlight这方面要苦手得多。在提取内容的时候，HTML本身会产生大量的http请求，这些请求很多对于程序是透明的，比如<code>&lt;img src="xxxxx"&gt;</code>。silverlight一般来说就是下载xap包，然后通过服务获得内容，这个过程麻烦得多。尤其是通常使用的WCF服务素有&ldquo;过于复杂&rdquo;的恶名。</p>
+<p>另外，xap包的体积也一直是个问题，silverlight的xap包很容易就会到达MB的数量级，前面说到Load OnDemand，实际上也是不得已而为之。</p>
