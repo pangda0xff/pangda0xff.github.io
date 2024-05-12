@@ -1,0 +1,21 @@
+@startuml 索引下推
+title 索引下推
+
+participant "MySQL Server" as server
+participant "Storage Engine" as engine
+
+alt 无下推
+server -> engine : zipcode='95054'
+engine -> Index : 读取所有符合\nzipcode='95054'的行
+engine <- Index
+server <- engine : 返回所有符合条件的行
+else 有下推
+server -> engine : zipcode='95054' \nAND lastname LIKE '%etrunia%'
+engine -> Index : 读取所有符合\nzipcode='95054'的行
+engine -[#red]> engine : <color red>**通过lastname进行筛选**</color>
+server <- engine : 返回所有符合条件的行\n不含lastname不符合的行
+end
+server -> Table : 读取完整的行
+server <- Table
+server -> server : 通过剩下的条件过滤
+@enduml
