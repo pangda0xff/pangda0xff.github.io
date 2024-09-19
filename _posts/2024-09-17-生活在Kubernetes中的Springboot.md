@@ -1,4 +1,9 @@
-#kubernetes #springboot
+---
+layout: post
+title:  "生活在Kubernetes中的Springboot"
+date:   2024-09-17 16:00:00 +0800
+tags: [kubernetes,springboot]
+---
 
 Springboot和Kubernetes中的很多功能都是重叠的，SpringCloud重合的就更多了。不过我还是希望尽可能采用微服务及服务网格这套思路，应用层做轻，SpringCloud就不用了，重合的部分也尽可能用Kubernetes的功能。
 

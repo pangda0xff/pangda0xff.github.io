@@ -18,7 +18,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: pangda0xff的流水账
+title: Are you enjoying the Time of Eve _
 email: pangda0xff@outlook.com
 description: ""
 baseurl: "" # the subpath of your site, e.g. /blog
@@ -30,6 +30,7 @@ github_username:  pangda0xff
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
 
 # Exclude from processing.
 # The following items will not be processed, by default.
